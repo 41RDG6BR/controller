@@ -12,27 +12,55 @@ class UserController {
         }
     }
 
-    //Index
+    // Index
     async index(req, res) {
         try {
             const users = await User.findAll();
-            //Você precisa retornar um valor no metodo async
+            // Você precisa retornar um valor no metodo async
             return res.json(users);
         } catch (e) {
-            //Se cair no catch o prog quebrou    
+            // Se cair no catch o prog quebrou    
             return res.json(null);
         }
     }
 
-    //Show
+    // Show
     async show (req, res) {
         try {
-            const users = await User.findByPk(req.params.id);
+            const { id } = req.params;
+            const users = await User.findByPk(id);
             return res.json(users);
         } catch (e) {
             return res.json(null);
         }
     }
+
+    // Update
+    async update (req, res) {
+        try {
+            if(req.params.id) {
+                return res.status(400).json({
+                    errors: ['ID não enviado.'],
+                })
+            }
+            const user = await User.findByPk(req.params.id);
+
+            if(!user) {
+                return res.status(400).json({
+                    errors: ['Usuário não existe.'],
+                })
+            }
+
+            const novosDados = await user.update(req.body);
+
+            return res.json(novosDados);
+        } catch (e) {
+            return res.status(400).json({
+                errors: e.errors.map((err) => err.message),
+            });
+        }
+    }
+    
 
 }
 
